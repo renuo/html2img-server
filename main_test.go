@@ -79,6 +79,6 @@ func TestEmptyRequest(t *testing.T) {
 }
 
 func url(apiToken string) string {
-	port := os.Getenv("PORT")
+	port := os.Getenv("APP_PORT")
 	return "http://localhost" + port + "/?token=" + apiToken
 }

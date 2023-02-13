@@ -68,6 +68,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Body == nil {
+		http.Error(w, "Empty request body", http.StatusBadRequest)
+		return
+	}
+
 	html, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
@@ -103,5 +108,5 @@ func main() {
 	chromeExecutable()
 
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("APP_PORT"), nil))
 }

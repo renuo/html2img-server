@@ -20,6 +20,11 @@ Set the API token as an environment variable
 export API_TOKEN=secret-token
 ```
 
+Set the APP_PORT as an environment variable, for example `localhost:3001`
+```
+export APP_PORT=:3001
+```
+
 Set the path to Google Chrome as an environment variable
 ```
 export CHROME_BIN=/usr/bin/google-chrome

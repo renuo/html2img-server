@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"image"
+	_ "image/png"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,39 +13,41 @@ import (
 
 func TestHandler(t *testing.T) {
 	html := []byte(`<html><body><h1>Hello, World!</h1></body></html>`)
-	htmlFile, err := ioutil.TempFile("", "*.html")
-	if err != nil {
-		t.Fatalf("Error creating temp file: %v", err)
-	}
-	defer os.Remove(htmlFile.Name())
-	if _, err := htmlFile.Write(html); err != nil {
-		t.Fatalf("Error writing to temp file: %v", err)
-	}
 
 	apiToken := os.Getenv("API_TOKEN")
 	req, err := http.NewRequest("POST", "http://localhost:8080/?token="+apiToken, bytes.NewBuffer(html))
 	if err != nil {
 		t.Fatalf("Error creating request: %v", err)
 	}
-	req.Header.Set("Content-Type", "text/html")
 
 	rr := httptest.NewRecorder()
-
 	handler(rr, req)
-
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	result, err := ioutil.ReadAll(rr.Body)
+	screenshot, err := ioutil.ReadAll(rr.Body)
 	if err != nil {
 		t.Fatalf("Error reading response body: %v", err)
 	}
-	if len(result) == 0 {
+
+	if len(screenshot) == 0 {
 		t.Errorf("handler returned an empty response")
 	}
 
-	if err := ioutil.WriteFile("result.png", result, 0644); err != nil {
+	img, _, err := image.Decode(bytes.NewBuffer(screenshot))
+	if err != nil {
+		t.Fatalf("Error decoding screenshot: %v", err)
+	}
+
+	zoomFactor := 2
+	expectedWidth := 600 * zoomFactor
+	expectedHeight := 310 * zoomFactor
+	if img.Bounds().Dx() != expectedWidth || img.Bounds().Dy() != expectedHeight {
+		t.Errorf("Unexpected screenshot dimensions: got %dx%d, want %dx%d", img.Bounds().Dx(), img.Bounds().Dy(), expectedWidth, expectedHeight)
+	}
+
+	if err := ioutil.WriteFile("result.png", screenshot, 0644); err != nil {
 		t.Fatalf("Error writing result to file: %v", err)
 	}
 }

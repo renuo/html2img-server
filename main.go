@@ -21,7 +21,7 @@ var CHROME_ARGS = []string{
 	"--force-device-scale-factor=2",
 }
 
-func runCommand(html []byte) ([]byte, error) {
+func takeScreenshot(html []byte) ([]byte, error) {
 	htmlFile, err := ioutil.TempFile("", "*.html")
 	if err != nil {
 		return nil, err
@@ -61,21 +61,28 @@ func runCommand(html []byte) ([]byte, error) {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
+	token := r.URL.Query().Get("token")
+	apiToken := os.Getenv("API_TOKEN")
+	if token != apiToken {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	html, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
 
-	result, err := runCommand(html)
+	result, err := takeScreenshot(html)
 	if err != nil {
-		http.Error(w, "Error running command", http.StatusInternalServerError)
+		http.Error(w, "Error while taking screenshot", http.StatusInternalServerError)
 		return
 	}
 
 	_, err = w.Write(result)
 	if err != nil {
-		http.Error(w, "Error writing result", http.StatusInternalServerError)
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
 		return
 	}
 }
@@ -92,12 +99,6 @@ func chromeExecutable() string {
 }
 
 func main() {
-	// Pre-boot google-chrome-stable
-	err := exec.Command(chromeExecutable(), "--headless", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage").Run()
-	if err != nil {
-		log.Fatalf("Error pre-booting google-chrome-stable: %v", err)
-	}
-
 	// check if chrome is installed
 	chromeExecutable()
 

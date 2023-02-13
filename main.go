@@ -98,6 +98,9 @@ func main() {
 		log.Fatalf("Error pre-booting google-chrome-stable: %v", err)
 	}
 
+	// check if chrome is installed
+	chromeExecutable()
+
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

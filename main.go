@@ -81,9 +81,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func chromeExecutable() string {
-	_, err := exec.LookPath("google-chrome-stable")
+	chrome := os.Getenv("CHROME_BIN")
+	_, err := exec.LookPath(chrome)
 	if err == nil {
-		return "google-chrome-stable"
+		return chrome
 	}
 
 	log.Fatal("Google Chrome not found")

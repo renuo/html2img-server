@@ -20,6 +20,14 @@ Set the API token as an environment variable
 export API_TOKEN=secret-token
 ```
 
+Set the path to Google Chrome as an environment variable
+```
+export CHROME_BIN=/usr/bin/google-chrome
+
+# macOS
+export CHROME_BIN=/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome
+```
+
 Build and run the API
 ```
 go build

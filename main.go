@@ -98,12 +98,6 @@ func chromeExecutable() string {
 }
 
 func main() {
-	// Pre-boot google-chrome-stable
-	err := exec.Command(chromeExecutable(), "--headless", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage").Run()
-	if err != nil {
-		log.Fatalf("Error pre-booting google-chrome-stable: %v", err)
-	}
-
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

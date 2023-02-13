@@ -9,6 +9,7 @@ This is a simple API that takes an HTML file as input, generates a screenshot us
 - Google Chrome
 - Go
 
+
 ## Usage
 
 Clone the repository

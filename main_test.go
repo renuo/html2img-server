@@ -18,7 +18,7 @@ func TestHandler(t *testing.T) {
 		</html>`)
 
 	apiToken := os.Getenv("API_TOKEN")
-	req, err := http.NewRequest("POST", "http://localhost:8080/?token="+apiToken, bytes.NewBuffer(html))
+	req, err := http.NewRequest("POST", url(apiToken), bytes.NewBuffer(html))
 	if err != nil {
 		t.Fatalf("Error creating request: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestHandler(t *testing.T) {
 }
 
 func TestUnauthorized(t *testing.T) {
-	req, _ := http.NewRequest("POST", "http://localhost:8080/?token=invalid", nil)
+	req, _ := http.NewRequest("POST", url("invalid-token"), nil)
 	rr := httptest.NewRecorder()
 
 	handler(rr, req)
@@ -68,7 +68,7 @@ func TestUnauthorized(t *testing.T) {
 
 func TestEmptyRequest(t *testing.T) {
 	apiToken := os.Getenv("API_TOKEN")
-	req, _ := http.NewRequest("POST", "http://localhost:8080/?token="+apiToken, nil)
+	req, _ := http.NewRequest("POST", url(apiToken), nil)
 	rr := httptest.NewRecorder()
 
 	handler(rr, req)
@@ -76,4 +76,9 @@ func TestEmptyRequest(t *testing.T) {
 	if status := rr.Code; status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusBadRequest)
 	}
+}
+
+func url(apiToken string) string {
+	port := os.Getenv("PORT")
+	return "http://localhost" + port + "/?token=" + apiToken
 }

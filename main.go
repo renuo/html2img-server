@@ -108,5 +108,5 @@ func main() {
 	chromeExecutable()
 
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("APP_PORT"), nil))
 }

@@ -12,7 +12,10 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	html := []byte(`<html><body><h1>Hello, World!</h1></body></html>`)
+	html := []byte(`<html>
+		<head><style>body {background-color: yellow;width: 600px;height: 310px;}</style></head>
+		<body><h1>Hello from Go!</h1></body>
+		</html>`)
 
 	apiToken := os.Getenv("API_TOKEN")
 	req, err := http.NewRequest("POST", "http://localhost:8080/?token="+apiToken, bytes.NewBuffer(html))

@@ -1,0 +1,39 @@
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      API_TOKEN: 1234
+      APP_PORT: :3000
+      CHROME_BIN: chrome
+
+    steps:
+    - uses: browser-actions/setup-chrome@v1
+    - run: chrome --version
+
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
+    
+    - name: Upload Go test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: Screenshot Result
+        path: result.png

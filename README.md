@@ -1,1 +1,34 @@
-# html2img-server
+# API for Generating Screenshots from HTML
+
+This is a simple API that takes an HTML file as input, generates a screenshot using Google Chrome, and returns the screenshot as a PNG image.
+
+## Requirements
+
+- Google Chrome
+- Go
+
+## Usage
+
+Clone the repository
+```
+git clone git@github.com:renuo/html2img-server.git
+cd html2img-server
+```
+
+Set the API token as an environment variable
+```
+export API_TOKEN=secret-token
+```
+
+Build and run the API
+```
+go build
+./html2img-server
+```
+
+Make a request to the API using curl or any other HTTP client
+```
+curl -X POST -d @sample.html http://localhost:8080/?token=secret-token --output screenshot.png 
+```
+Replace sample.html with the path to your HTML file, and secret-token with your API token.
+

@@ -1,0 +1,16 @@
+# Put this in /etc/systemd/system/html2img-server.service
+[Unit]
+Description=html2img-server
+
+[Service]
+User=root
+WorkingDirectory=/root/html2img-server
+Environment=CHROME_BIN=/usr/bin/google-chrome-stable
+Environment=API_TOKEN=<TOKEN>
+Environment=APP_PORT=:80
+ExecStart=/root/html2img-server/html2img-server
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

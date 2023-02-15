@@ -47,3 +47,20 @@ curl -X POST -d @sample.html http://localhost:3001/?token=secret-token --output 
 ```
 Replace sample.html with the path to your HTML file, and secret-token with your API token.
 
+# systemd setup
+
+To run the executable as a background service we use a systemd configuration. It is based on the `html2img-server.service.template` file and needs to be placed in /etc/systemd/system/html2img-server.service with the correct token set.
+
+After creating/changing the file you need to run `systemctl daemon-reload`
+
+When setting it up on a new server you need to run `systemctl enable html2img-server.service` once.
+
+Then you can manage the service like any other with these commands:
+
+```
+service html2img-server stop
+service html2img-server start
+service html2img-server status
+```
+
+If the service does crash it will log to `/var/log/syslog`

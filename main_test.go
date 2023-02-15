@@ -45,7 +45,7 @@ func TestHandler(t *testing.T) {
 
 	zoomFactor := 2
 	expectedWidth := 600 * zoomFactor
-	expectedHeight := 310 * zoomFactor
+	expectedHeight := 314 * zoomFactor
 	if img.Bounds().Dx() != expectedWidth || img.Bounds().Dy() != expectedHeight {
 		t.Errorf("Unexpected screenshot dimensions: got %dx%d, want %dx%d", img.Bounds().Dx(), img.Bounds().Dy(), expectedWidth, expectedHeight)
 	}

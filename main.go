@@ -13,7 +13,7 @@ import (
 var CHROME_ARGS = []string{
 	"--headless",
 	"--hide-scrollbars",
-	"--window-size=600,310",
+	"--window-size=600,314",
 	"--disable-extensions",
 	"--no-sandbox",
 	"--disable-background-networking",

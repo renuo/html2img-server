@@ -1,12 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"image"
+	_ "image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 )
 
@@ -19,6 +24,17 @@ var CHROME_ARGS = []string{
 	"--disable-background-networking",
 	"--disable-cache",
 	"--force-device-scale-factor=2",
+}
+
+const minScreenshotBytes = 1024
+
+func chromeTimeout() time.Duration {
+	if raw := os.Getenv("CHROME_TIMEOUT_SECONDS"); raw != "" {
+		if seconds, err := strconv.Atoi(raw); err == nil {
+			return time.Duration(seconds) * time.Second
+		}
+	}
+	return 10 * time.Second
 }
 
 func takeScreenshot(html []byte) ([]byte, error) {
@@ -40,7 +56,12 @@ func takeScreenshot(html []byte) ([]byte, error) {
 	defer os.Remove(screenshotFile.Name())
 
 	params := append(CHROME_ARGS, fmt.Sprintf("file://%s", htmlFile.Name()), fmt.Sprintf("--screenshot=%s", screenshotFile.Name()))
-	cmd := exec.Command(chromeExecutable(), params...)
+
+	timeout := chromeTimeout()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, chromeExecutable(), params...)
 	log.Println("Running command: ", cmd.String())
 
 	start := time.Now()
@@ -48,6 +69,9 @@ func takeScreenshot(html []byte) ([]byte, error) {
 	elapsed := time.Since(start)
 	log.Printf("Time taken: %s", elapsed)
 
+	if ctx.Err() == context.DeadlineExceeded {
+		return nil, fmt.Errorf("chrome timed out after %s", timeout)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +81,23 @@ func takeScreenshot(html []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	if err := validateScreenshot(screenshot); err != nil {
+		return nil, err
+	}
+
 	return screenshot, nil
+}
+
+func validateScreenshot(data []byte) error {
+	if len(data) < minScreenshotBytes {
+		return fmt.Errorf("screenshot is too small (%d bytes)", len(data))
+	}
+
+	if _, _, err := image.Decode(bytes.NewReader(data)); err != nil {
+		return fmt.Errorf("screenshot is not a decodable image: %w", err)
+	}
+
+	return nil
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +121,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	result, err := takeScreenshot(html)
 	if err != nil {
+		log.Println("takeScreenshot failed:", err)
 		http.Error(w, "Error while taking screenshot", http.StatusInternalServerError)
 		return
 	}

@@ -26,8 +26,6 @@ var CHROME_ARGS = []string{
 	"--force-device-scale-factor=2",
 }
 
-// A well-formed screenshot is always several KB; anything under this is
-// almost certainly an empty/truncated capture.
 const minScreenshotBytes = 1024
 
 func chromeTimeout() time.Duration {
@@ -90,8 +88,6 @@ func takeScreenshot(html []byte) ([]byte, error) {
 	return screenshot, nil
 }
 
-// validateScreenshot rejects captures that are empty or not a decodable
-// image.
 func validateScreenshot(data []byte) error {
 	if len(data) < minScreenshotBytes {
 		return fmt.Errorf("screenshot is too small (%d bytes)", len(data))

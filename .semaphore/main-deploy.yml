@@ -15,6 +15,6 @@ blocks:
         - name: main-deploy
           commands:
             - checkout --use-cache
-            - git remote add dokku ssh://dokku@$HETZNER_IP_MAIN:22/html2img-server
+            - git remote add dokku ssh://dokku@5.161.119.37:22/html2img-server
             - chmod 600 /home/semaphore/.ssh/dokku
             - GIT_SSH_COMMAND="ssh -i /home/semaphore/.ssh/dokku -o StrictHostKeyChecking=no" git push dokku -f $SEMAPHORE_GIT_BRANCH:main

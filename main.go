@@ -90,53 +90,18 @@ func takeScreenshot(html []byte) ([]byte, error) {
 	return screenshot, nil
 }
 
-// validateScreenshot rejects captures that are empty, not a decodable
-// image, or effectively blank (chrome's --screenshot flag can take the
-// shot before webfonts/remote images have finished painting).
+// validateScreenshot rejects captures that are empty or not a decodable
+// image.
 func validateScreenshot(data []byte) error {
 	if len(data) < minScreenshotBytes {
 		return fmt.Errorf("screenshot is too small (%d bytes)", len(data))
 	}
 
-	img, _, err := image.Decode(bytes.NewReader(data))
-	if err != nil {
+	if _, _, err := image.Decode(bytes.NewReader(data)); err != nil {
 		return fmt.Errorf("screenshot is not a decodable image: %w", err)
 	}
 
-	if isBlank(img) {
-		return fmt.Errorf("screenshot appears blank")
-	}
-
 	return nil
-}
-
-// isBlank samples a grid of pixels across the image and reports whether
-// they are all (near) identical, the signature of a screenshot taken
-// before the page finished rendering.
-func isBlank(img image.Image) bool {
-	const step = 10
-	const tolerance = 1024 // out of 65535 per channel
-
-	bounds := img.Bounds()
-	firstR, firstG, firstB, _ := img.At(bounds.Min.X, bounds.Min.Y).RGBA()
-
-	for y := bounds.Min.Y; y < bounds.Max.Y; y += step {
-		for x := bounds.Min.X; x < bounds.Max.X; x += step {
-			r, g, b, _ := img.At(x, y).RGBA()
-			if channelDiff(r, firstR) > tolerance || channelDiff(g, firstG) > tolerance || channelDiff(b, firstB) > tolerance {
-				return false
-			}
-		}
-	}
-
-	return true
-}
-
-func channelDiff(a, b uint32) uint32 {
-	if a > b {
-		return a - b
-	}
-	return b - a
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

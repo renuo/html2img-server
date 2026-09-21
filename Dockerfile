@@ -8,7 +8,7 @@ COPY . .
 RUN go build -o main .
 
 # Final stage
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # Install Chromium, base fonts, and tools to fetch custom fonts
 RUN apt-get update && apt-get install -y \

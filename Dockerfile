@@ -1,11 +1,13 @@
 # Build stage
-FROM golang:1.19 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.19 AS builder
+
+ARG TARGETOS TARGETARCH
 
 WORKDIR /app
 COPY go.mod ./
 COPY . .
 
-RUN go build -o main .
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o main .
 
 # Final stage
 FROM debian:bookworm-slim

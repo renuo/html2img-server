@@ -1,5 +1,5 @@
 version: "v1.0"
-name: mugshotbot
+name: html2img-server
 agent:
   machine:
     type: f1-standard-4
@@ -10,16 +10,60 @@ auto_cancel:
 fail_fast:
   cancel:
     when: "branch != 'main'"
+
 blocks:
-  - name: "Noop"
+  - name: test
+    dependencies: []
+    execution_time_limit:
+      minutes: 5
     task:
+      env_vars:
+        - name: API_TOKEN
+          value: "1234"
+        - name: APP_PORT
+          value: ":3000"
+        - name: CHROME_BIN
+          value: google-chrome
+      prologue:
+        commands:
+          - checkout
+          - sem-version go 1.24
       jobs:
-        - name: "Noop"
+        - name: go test
           commands:
-            - echo "ok"
+            - go build -v ./...
+            - go test -v ./...
+      epilogue:
+        on_fail:
+          commands:
+            - artifact push job --expire-in 2w *.png || true
+            - artifact push job --expire-in 2w *.log || true
+
+  - name: build image
+    dependencies: []
+    execution_time_limit:
+      minutes: 10
+    task:
+      secrets:
+        - name: ghcr
+      env_vars:
+        - name: IMAGE
+          value: ghcr.io/coorasse/html2img-server
+      jobs:
+        - name: docker build and push
+          commands:
+            - checkout
+            - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            - docker buildx create --use
+            - >-
+              docker buildx build --push
+              --cache-from type=registry,ref=$IMAGE:buildcache
+              --cache-to type=registry,ref=$IMAGE:buildcache,mode=max
+              -t $IMAGE:$SEMAPHORE_GIT_SHA .
+
 promotions:
   - name: main
     pipeline_file: main-deploy.yml
     auto_promote:
-      when: "true"
+      when: "result = 'passed' and branch = 'main'"
     deployment_target: main

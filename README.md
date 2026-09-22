@@ -1,6 +1,6 @@
 # API for Generating Screenshots from HTML
 
-[![Go](https://github.com/coorasse/html2img-server/actions/workflows/go.yml/badge.svg)](https://github.com/coorasse/html2img-server/actions/workflows/go.yml)
+[![Build Status](https://coorasse.semaphoreci.com/badges/html2img-server/branches/main.svg)](https://coorasse.semaphoreci.com/projects/html2img-server)
 
 This is a simple API that takes an HTML file as input, generates a screenshot using Google Chrome, and returns the screenshot as a PNG image.
 
@@ -21,7 +21,7 @@ cd html2img-server
 docker build -t html2img-server .
 ```
 
-Or pull the prebuilt image, published to GHCR from `main` by the Docker image workflow:
+Or pull the prebuilt image, built on Semaphore for every commit and tagged `latest` when `main` is deployed:
 ```bash
 docker pull ghcr.io/coorasse/html2img-server:latest
 ```

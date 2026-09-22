@@ -18,11 +18,6 @@ blocks:
           commands:
             - echo "ok"
 promotions:
-  - name: develop
-    pipeline_file: develop-deploy.yml
-    auto_promote:
-      when: "true"
-    deployment_target: develop
   - name: main
     pipeline_file: main-deploy.yml
     auto_promote:

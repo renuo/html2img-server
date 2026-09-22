@@ -1,6 +1,6 @@
 # API for Generating Screenshots from HTML
 
-[![Go](https://github.com/renuo/html2img-server/actions/workflows/go.yml/badge.svg)](https://github.com/renuo/html2img-server/actions/workflows/go.yml)
+[![Go](https://github.com/coorasse/html2img-server/actions/workflows/go.yml/badge.svg)](https://github.com/coorasse/html2img-server/actions/workflows/go.yml)
 
 This is a simple API that takes an HTML file as input, generates a screenshot using Google Chrome, and returns the screenshot as a PNG image.
 
@@ -12,7 +12,7 @@ This is a simple API that takes an HTML file as input, generates a screenshot us
 
 Clone the repository
 ```bash
-git clone git@github.com:renuo/html2img-server.git
+git clone git@github.com:coorasse/html2img-server.git
 ```
 
 Build the image

@@ -21,6 +21,11 @@ cd html2img-server
 docker build -t html2img-server .
 ```
 
+Or pull the prebuilt image, published to GHCR from `main` by the Docker image workflow:
+```bash
+docker pull ghcr.io/coorasse/html2img-server:latest
+```
+
 Run it and test it:
 
 ```bash
